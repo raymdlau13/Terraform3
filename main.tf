@@ -1,28 +1,3 @@
-# variable "app-servers" {
-#     type = list(object({
-#         env = string
-#         num_of_server = number
-#         symbol = string
-#         name = string
-#     }))
-#     default = [{
-#         env = "dev"
-#         num_of_server = 3
-#         symbol = "d"
-#         name = "app"
-#     },{
-#         env = "qa"
-#         num_of_server = 3
-#         symbol = "a"
-#         name = "app"
-#     },{
-#         env = "uat"
-#         num_of_server = 3
-#         symbol = "u"
-#         name = "app"
-#     }
-#     ]
-# }
 provider "aws" {
     region = "us-east-1"
 }
@@ -31,12 +6,9 @@ variable "vpc_id" {
     type = string
     default = "vpc-840ea0f9"
 }
+
 data "aws_vpc" "selected" {
     id = var.vpc_id
-}
-output "app-server" {
-    #value = var.app-servers["dev"].servers
-    value = flatten(values(var.app-servers)[*].servers)
 }
 
 resource "aws_security_group" "allow_ssh" {
@@ -81,14 +53,15 @@ resource "aws_key_pair" "ux-app-key" {
 
 resource "aws_instance" "ux-app" {
 #    for_each = toset(var.app-servers["dev"].servers)
-    for_each = toset(flatten(values(var.app-servers)[*].servers))
-    ami = "ami-03d315ad33b9d49c4"
-    instance_type = "t2.micro"
+    for_each = var.app-servers
+    ami = each.value.ami
+    instance_type = each.value.instance_type
     key_name = aws_key_pair.ux-app-key.key_name
     #security_groups = ["${data.aws_security_groups.sg.ids}[0]"]
     #vpc_security_group_ids = ["sg-0a7b3d5d67b1800bc"]
     vpc_security_group_ids = tolist(data.aws_security_groups.sgroups.ids)    
     tags = {
-        Name = each.value
+        Name = each.key
+        Environment = each.value.env
     }
 }
