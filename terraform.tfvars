@@ -4,7 +4,7 @@ app-servers = {
             ami = "ami-03d315ad33b9d49c4"
             instance_type = "t2.micro"
         }
-        appa01 = {
+        appq01 = {
             env = "qa"
             ami = "ami-03d315ad33b9d49c4"
             instance_type = "t2.micro"        
