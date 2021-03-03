@@ -11,6 +11,10 @@ data "aws_vpc" "selected" {
     id = var.vpc_id
 }
 
+locals {
+    yamlservers = yamldecode(file("app_servers.yaml"))
+}
+
 resource "aws_security_group" "allow_ssh" {
     name = "allow_ssh"
     vpc_id = var.vpc_id
@@ -35,15 +39,6 @@ data "aws_security_groups" "sgroups" {
         name = "vpc-id"
         values = [var.vpc_id]
     }
-    # filter {
-    #     name = "group-name"
-    #     values = ["allow_ssh"]
-    # }
-}
-
-output "all_sg" {
-    #value = data.aws_security_group.sgs
-    value = tolist(data.aws_security_groups.sgroups.ids)
 }
 
 resource "aws_key_pair" "ux-app-key" {
@@ -52,13 +47,11 @@ resource "aws_key_pair" "ux-app-key" {
 }
 
 resource "aws_instance" "ux-app" {
-#    for_each = toset(var.app-servers["dev"].servers)
-    for_each = var.app-servers
-    ami = each.value.ami
-    instance_type = each.value.instance_type
+    for_each = local.yamlservers.app_servers
+    #for_each = var.app_servers
+    ami = each.value.ami != "" ? each.value.ami : var.default_ami
+    instance_type = each.value.instance_type != "" ? each.value.instance_type : var.default_instance_type
     key_name = aws_key_pair.ux-app-key.key_name
-    #security_groups = ["${data.aws_security_groups.sg.ids}[0]"]
-    #vpc_security_group_ids = ["sg-0a7b3d5d67b1800bc"]
     vpc_security_group_ids = tolist(data.aws_security_groups.sgroups.ids)    
     tags = {
         Name = each.key
