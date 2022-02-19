@@ -1,6 +1,6 @@
 app_server: &default
   env: dev
-  ami: ami-03d315ad33b9d49c4
+  ami: ami-04505e74c0741db8d
   instance_type: t2.micro
 
 app_servers:

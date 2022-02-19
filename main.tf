@@ -51,11 +51,11 @@ data "aws_security_groups" "sgroups" {
 }
 
 resource "aws_key_pair" "ux_app_key" {
-    key_name = "ux-app-key"
+    key_name = "ux_app_key"
     public_key = var.ux_app_public_key
 }
 
-resource "aws_instance" "ux-app" {
+resource "aws_instance" "ux_app" {
     for_each = local.appservers
     #for_each = var.app_servers
     ami = each.value.ami != "" ? each.value.ami : var.default_ami
