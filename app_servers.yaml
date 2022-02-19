@@ -7,15 +7,15 @@ app_servers:
   appd01:
     <<: *default
     env: dev
-  appd02:
-    <<: *default
-    env: dev
-  appd03:
-    <<: *default
-    env: dev        
-  appq01:
-    <<: *default
-    env: qa
-  appu01:
-    <<: *default
-    env: uat
+  # appd02:
+  #   <<: *default
+  #   env: dev
+  # appd03:
+  #   <<: *default
+  #   env: dev        
+  # appq01:
+  #   <<: *default
+  #   env: qa
+  # appu01:
+  #   <<: *default
+  #   env: uat
