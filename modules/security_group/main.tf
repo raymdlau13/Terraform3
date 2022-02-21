@@ -1,16 +1,19 @@
 locals {
-  security_group_rules_yaml = yamldecode(file(var.security_group_rules_yaml_file))
-  sg_rules                  = (local.security_group_rules_yaml.rules == null) ? {} : local.security_group_rules_yaml.rules
-  security_group_name       = local.security_group_rules_yaml.security_group_name
-  security_group_description       = local.security_group_rules_yaml.security_group_description
+  security_group_rules_yaml  = yamldecode(file(var.security_group_rules_yaml_file))
+  sg_rules                   = (local.security_group_rules_yaml.rules == null) ? {} : local.security_group_rules_yaml.rules
+  sg_tags                    = (local.security_group_rules_yaml.tags == null) ? {} : local.security_group_rules_yaml.tags
+  security_group_name        = local.security_group_rules_yaml.security_group_name
+  security_group_description = local.security_group_rules_yaml.security_group_description
 }
 
 resource "aws_security_group" "sg" {
   name        = local.security_group_name
   description = local.security_group_description
   vpc_id      = data.aws_vpc.selected.id
+
   tags = {
-    Name = local.security_group_name
+    for tag in local.sg_tags:
+      tag.name => tag.value
   }
 }
 

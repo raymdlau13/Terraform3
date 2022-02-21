@@ -1,5 +1,12 @@
 security_group_name: win_server_sg
 security_group_description: security group for windows servers
+tags:
+  tag01:
+    name: "Environment"
+    value: "windows"
+  tag02:
+    name: "Name"
+    value: "win_server_sg"
 rules:
   allow_all_outbound:
     description: allow all outbound
