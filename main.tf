@@ -2,51 +2,26 @@ provider "aws" {
     region = var.region
 }
 
-# variable "vpc_id" {
-#     type = string
-#     default = var.vpc_id
-# }
-
-# data "aws_vpc" "selected" {
-#     id = var.vpc_id
-# }
-
 locals {
     yamlservers = yamldecode(file("app_servers.yaml"))
     appservers = ( local.yamlservers.app_servers == null ) ? {} : local.yamlservers.app_servers
 }
 
-resource "aws_security_group" "allow_ssh" {
-    name = "allow_ssh"
+module "security_groups" {
+    source = "./modules/security_group"
+    for_each = fileset("${path.root}/variables/security_groups","*.yaml")
+    # security_group_name = "ux_app"
+    # security_group_description = "ux_app security group"
     vpc_id = var.vpc_id
-    description = "Allow SSH inbound traffic"
-
-    ingress {
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    tags = {
-        Name = "allow_ssh"
-        Environment = "Linux"
-    }
+    security_group_rules_yaml_file = "${path.root}/variables/security_groups/${each.value}"
 }
-
 data "aws_security_groups" "sgroups" {
     filter {
         name = "vpc-id"
         values = [var.vpc_id]
     }
     depends_on = [
-        aws_security_group.allow_ssh
+        module.security_groups
     ]
 }
 

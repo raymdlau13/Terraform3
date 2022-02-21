@@ -1,0 +1,21 @@
+security_group_name: win_server_sg
+security_group_description: security group for windows servers
+rules:
+  allow_all_outbound:
+    description: allow all outbound
+    type: egress
+    from_port: 0
+    to_port: 0
+    protocol: -1
+  allow_rdp_tcp_inbound:
+    description: enable RDP (TCP)
+    type: ingress
+    from_port: 3389
+    to_port: 3389
+    protocol: tcp
+  allow_rdp_udp_inbound:
+    description: enable RDP (UDP)
+    type: ingress
+    from_port: 3389
+    to_port: 3389
+    protocol: udp
